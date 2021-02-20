@@ -147,3 +147,124 @@ ReactDOM.render(
 
 </details>
 ```
+
+---
+
+## Structuring a project with React Redux
+
+There isn't any "percect" strategy in order to integrate Redux into a React project..
+But certainly, we can try to follow certain practices in order to be able to work in better conditions in our project.
+
+### 1) Folder Structure
+
+```
+/src
+.../redux
+....../actions
+.........index.js
+....../reducers
+.........reducer1.js
+.........reducer2.js
+.........reducer3.js
+.........index.js
+......createStore.js
+```
+
+---
+
+### 2) Create Reducer
+
+Inside reducers folder, we need an **index.js** where we are gonna combine all the reducers
+
+```js
+import { combineReducers } from "redux";
+
+const rootReducer = combineReducers({
+	counter: counterReducer,
+	isLogged: loggedReducer,
+});
+```
+
+---
+
+### 3) Create Store
+
+We are gonna create a **createStore** file inside /redux, where we will have our store create (taking the already created rootReducer).
+We can pass `window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()` to the store to be able to use redux devtools extensions.
+Instead of this, we can use the npm package for this.
+
+```js
+import rootReducer from "./reducers";
+import { createStore } from "redux";
+
+const store = createStore(
+	rootReducer,
+	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
+```
+
+---
+
+### 4) Wrap App with provider and pass store as a argument
+
+```js
+import { Provider } from "react-redux";
+
+ReactDOM.render(
+	<React.StrictMode>
+		<Provider store={store}>
+			<App />
+		</Provider>
+	</React.StrictMode>,
+	document.getElementById("root")
+);
+```
+
+---
+
+### 5) Create the Actions
+
+Inside the actions folders, we can create as many Actions we need.
+In a more complex project, we can create a subfolder for each action, and then use **action.helpers**, **action.action**, etc...
+
+```js
+export const increment = () => {
+	return {
+		type: "INCREMENT",
+	};
+};
+
+export const decrement = () => {
+	return {
+		type: "DECREMENT",
+	};
+};
+```
+
+---
+
+### 6) Now we can use Redux!
+
+**useSelector**: It gives access to a Reducer
+**useDispatch**: It calls an action
+
+```js
+import { useSelector, useDispatch } from "react-redux";
+import { increment, decrement } from "./redux/actions";
+
+function App() {
+	const counter = useSelector((state) => state.counter);
+	const dispatch = useDispatch();
+
+	return (
+		<div className="App">
+			<h1>React Redux Laboratory</h1>
+			<h2>Counter: {counter}</h2>
+			<button onClick={() => dispatch(increment())}>+</button>
+			<button onClick={() => dispatch(decrement())}>-</button>
+		</div>
+	);
+}
+
+export default App;
+```
